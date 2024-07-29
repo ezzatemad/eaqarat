@@ -113,7 +113,7 @@ fun SignInContent() {
             isPassword = true
         )
 
-        Terms(onTermsClicked = {
+        SignInTerms(onTermsClicked = {
 
         },
             onPrivacyPolicyClicked = {
@@ -294,7 +294,7 @@ fun SignInBottomBar() {
 }
 
 @Composable
-fun Terms(onTermsClicked: () -> Unit, onPrivacyPolicyClicked: () -> Unit) {
+fun SignInTerms(onTermsClicked: () -> Unit, onPrivacyPolicyClicked: () -> Unit) {
     var isChecked by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -318,7 +318,7 @@ fun Terms(onTermsClicked: () -> Unit, onPrivacyPolicyClicked: () -> Unit) {
             ClickableText(
                 text = buildAnnotatedString {
                     withStyle(style = SpanStyle(color = colorResource(id = R.color.gray))) {
-                        append("By registering, you are agreeing with our ")
+                        append(stringResource(R.string.by_registering_you_are_agreeing_with_our))
                     }
                     pushStyle(
                         SpanStyle(
@@ -332,11 +332,11 @@ fun Terms(onTermsClicked: () -> Unit, onPrivacyPolicyClicked: () -> Unit) {
                             textDecoration = TextDecoration.Underline
                         )
                     ) {
-                        append("Terms of Use")
+                        append(stringResource(id = R.string.terms_of_use))
                     }
                     pop()
                     withStyle(style = SpanStyle(color = colorResource(id = R.color.gray))) {
-                        append(" and ")
+                        append(stringResource(id = R.string.and))
                     }
                     pushStyle(
                         SpanStyle(
@@ -350,7 +350,7 @@ fun Terms(onTermsClicked: () -> Unit, onPrivacyPolicyClicked: () -> Unit) {
                             textDecoration = TextDecoration.Underline
                         )
                     ) {
-                        append("Privacy Policy")
+                        append(stringResource(id = R.string.privacy_policy))
                     }
                     pop()
                 },

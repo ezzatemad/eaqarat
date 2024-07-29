@@ -62,7 +62,6 @@ dependencies {
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation("androidx.room:room-ktx:$room_version")
 
-    implementation ("com.google.android.gms:play-services-mlkit-text-recognition:19.0.0")
     implementation("com.google.code.gson:gson:2.8.6")
 
 
@@ -77,8 +76,6 @@ dependencies {
     val work_version = "2.9.0"
     implementation ("androidx.work:work-runtime-ktx:$work_version")
 
-    // Firebase Messegeing
-    implementation("com.google.firebase:firebase-messaging")
 
 }
 
