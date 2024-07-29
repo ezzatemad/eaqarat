@@ -110,11 +110,6 @@ dependencies {
     val lottieVersion = "6.4.0"
     implementation("com.airbnb.android:lottie:$lottieVersion")
 
-    implementation("com.github.chnouman:AwesomeDialog:1.0.5")
-
-    //AwesomeDialog
-    implementation("com.github.chnouman:AwesomeDialog:1.0.5")
-    implementation("com.github.balwinderSingh1989:androidBestLocationTracker:2.0.10")
 
 }
 kapt {

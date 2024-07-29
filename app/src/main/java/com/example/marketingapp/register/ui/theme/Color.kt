@@ -1,4 +1,4 @@
-package com.example.marketingapp.ui.theme
+package com.example.marketingapp.register.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
@@ -9,5 +9,6 @@ val Pink80 = Color(0xFFEFB8C8)
 val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
-val splasch_background = Color(0xFF31794F)
-val welcome_screen = Color(0xFFF5F5F5)
+
+val text_field_background = Color(0xFFF8F8F8)
+val text_field_border = Color(0xFFDDDDDD)
