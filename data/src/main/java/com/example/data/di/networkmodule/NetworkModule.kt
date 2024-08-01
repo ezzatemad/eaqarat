@@ -1,6 +1,7 @@
 package com.example.data.di.networkmodule
 
 import android.content.Context
+import com.example.data.apiservice.getallproperty.PropertyApiService
 import com.example.data.apiservice.register.RegisterApiService
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -21,6 +22,23 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    fun provideGetAllPropertyApiService(
+        retrofit: Retrofit
+    ): PropertyApiService {
+        return retrofit.create(PropertyApiService::class.java)
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideRegisterApiService(
+        retrofit: Retrofit
+    ): RegisterApiService {
+        return retrofit.create(RegisterApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
     fun provideRetrofit(
         gson: Gson,
         okHttpClient: OkHttpClient,
@@ -32,15 +50,6 @@ object NetworkModule {
             .addConverterFactory(gsonConverterFactory)
             .build()
     }
-
-    @Provides
-    @Singleton
-    fun provideRegisterApiService(
-        retrofit: Retrofit
-    ): RegisterApiService {
-        return retrofit.create(RegisterApiService::class.java)
-    }
-
 
     @Provides
     @Singleton
@@ -60,7 +69,7 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideGsonConverterFactory():GsonConverterFactory{
+    fun provideGsonConverterFactory(): GsonConverterFactory {
         return GsonConverterFactory.create()
     }
 }

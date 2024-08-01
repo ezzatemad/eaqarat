@@ -1,4 +1,4 @@
-package com.example.domain.repository.getallproperty
+package com.example.domain.datamodel.getallproperty
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize

@@ -27,7 +27,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.domain.datamodel.register.login.LoginRequest
 import com.example.marketingapp.Dimension
-import com.example.marketingapp.MainActivity
+import com.example.marketingapp.home.MainActivity
 import com.example.marketingapp.R
 import com.example.marketingapp.TokenManager
 import com.example.marketingapp.register.signin.SignInButton
