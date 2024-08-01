@@ -9,6 +9,10 @@ class SignInUseCase @Inject constructor(
     private val signInRepo: SignInRepo
 ) {
     suspend fun signIn(user: User): RegisterResponse {
-        return signInRepo.signIn(user)
+        return try {
+            signInRepo.signIn(user)
+        } catch (ex: Exception) {
+            throw ex
+        }
     }
 }

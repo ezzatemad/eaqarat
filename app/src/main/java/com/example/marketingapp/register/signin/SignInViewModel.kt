@@ -67,6 +67,8 @@ class SignInViewModel @Inject constructor(
         if (user.username.isEmpty()) {
             _nameError.value = "Name is required"
             isValid = false
+        } else if (user.username.length < 3) {
+            _nameError.value="Name cannot less than 3 charterers"
         } else {
             _nameError.value = null
         }
