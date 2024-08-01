@@ -31,5 +31,11 @@
     <string name="and">" and "</string>
     <string name="terms_of_use">Terms of Use</string>
     <string name="by_registering_you_are_agreeing_with_our">"By registering, you are agreeing with our "</string>
+    <string name="phone">Phone</string>
+    <string name="select_role">Select Role</string>
+    <string name="please_agree_to_the_terms_and_conditions">Please agree to the terms and conditions</string>
+    <string name="passwords_do_not_match">Passwords do not match</string>
+    <string name="confirm_password_required">Confirm Password Required</string>
+    <string name="title_activity_main">MainActivity</string>
 
 </resources>
