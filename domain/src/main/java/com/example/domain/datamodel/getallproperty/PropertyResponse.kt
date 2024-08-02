@@ -1,7 +1,7 @@
 package com.example.domain.datamodel.getallproperty
 
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class PropertyResponse(
@@ -13,4 +13,4 @@ data class PropertyResponse(
 	val message: String? = null,
 
 	val statusCode: Int? = null
-) : Parcelable
+):Parcelable
