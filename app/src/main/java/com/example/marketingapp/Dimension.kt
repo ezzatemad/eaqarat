@@ -22,4 +22,8 @@ object Dimension {
     val SmallSpace = 4.dp
     val MediumSpace = 8.dp
     val LargeSpace = 12.dp
+
+    val SmallImageHeight = 150.dp
+    val MediumImageHeight = 200.dp
+    val LargeImageHeight = 250.dp
 }

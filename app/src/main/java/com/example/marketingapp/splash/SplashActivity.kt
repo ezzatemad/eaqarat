@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import com.example.marketingapp.home.MainActivity
+import com.example.marketingapp.main.MainActivity
 import com.example.marketingapp.TokenManager
 import com.example.marketingapp.register.RegisterActivity
 import com.example.marketingapp.ui.theme.splasch_background
