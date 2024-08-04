@@ -1,8 +1,11 @@
 package com.example.data.di.networkmodule
 
 import android.content.Context
+import com.example.data.apiservice.filterproperty.FilterPropertyApiService
 import com.example.data.apiservice.getallproperty.PropertyApiService
 import com.example.data.apiservice.register.RegisterApiService
+import com.example.data.apiservice.search.SearchApiService
+import com.example.data.apiservice.sortproperty.SortPropertyApiService
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -18,6 +21,30 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
+
+    @Provides
+    @Singleton
+    fun provideGetSortApiService(
+        retrofit: Retrofit
+    ): SortPropertyApiService {
+        return retrofit.create(SortPropertyApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetSearchApiService(
+        retrofit: Retrofit
+    ): SearchApiService {
+        return retrofit.create(SearchApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetFilterPropertyApiService(
+        retrofit: Retrofit
+    ): FilterPropertyApiService {
+        return retrofit.create(FilterPropertyApiService::class.java)
+    }
 
 
     @Provides
