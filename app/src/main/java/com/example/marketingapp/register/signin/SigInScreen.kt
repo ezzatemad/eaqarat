@@ -122,7 +122,6 @@ fun SignInScreen(
 }
 
 
-
 @Composable
 fun SignInContent(viewModel: SignInViewModel, isLoading: Boolean) {
     Spacer(modifier = Modifier.height(Dimension.LargePadding))
@@ -168,7 +167,7 @@ fun SignInContent(viewModel: SignInViewModel, isLoading: Boolean) {
             onTextChange = { newText -> phone = newText },
             label = stringResource(id = R.string.phone),
             maxLines = 1,
-            icon = R.drawable.ic_password,
+            icon = R.drawable.ic_email,
             modifier = Modifier,
             isPassword = false,
             error = phoneError
@@ -331,7 +330,7 @@ fun SignInTextField(
                 {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
-                            painter = painterResource(id = if (passwordVisible) R.drawable.ic_user else R.drawable.ic_email),
+                            painter = painterResource(id = if (passwordVisible) R.drawable.ic_hide_eye else R.drawable.ic_hide_eye),
                             contentDescription = if (passwordVisible) "Hide password" else "Show password",
                             tint = colorResource(id = R.color.green)
                         )

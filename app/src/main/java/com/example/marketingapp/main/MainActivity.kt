@@ -26,7 +26,11 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.navigation.NavType
 import androidx.navigation.compose.*
+import androidx.navigation.navArgument
+import com.example.domain.datamodel.getallproperty.DataItem
 import com.example.marketingapp.R
 import com.example.marketingapp.account.AccountScreen
 import com.example.marketingapp.home.HomeScreen
@@ -44,7 +48,6 @@ class MainActivity : ComponentActivity() {
     }
 
 
-
     @Composable
     fun MainScreen() {
         val navController = rememberNavController()
@@ -57,34 +60,98 @@ class MainActivity : ComponentActivity() {
                     backgroundColor = Color.White
                 ) {
                     BottomNavigationItem(
-                        icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
+                        icon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_home),
+                                contentDescription = "Home"
+                            )
+                        },
                         label = { Text("Home") },
                         selected = currentRoute == "home",
-                        onClick = { navController.navigate("home") },
+                        onClick = {
+                            if (currentRoute != "home") {
+                                navController.navigate("home") {
+                                    // Clear back stack to prevent navigating back to the same screen
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
+                        },
                         selectedContentColor = colorResource(id = R.color.green),
                         unselectedContentColor = colorResource(id = R.color.gray)
                     )
                     BottomNavigationItem(
-                        icon = { Icon(Icons.Filled.Search, contentDescription = "Search") },
+                        icon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_search),
+                                contentDescription = "Search"
+                            )
+                        },
                         label = { Text("Search") },
                         selected = currentRoute == "search",
-                        onClick = { navController.navigate("search") },
+                        onClick = {
+                            if (currentRoute != "search") {
+                                navController.navigate("search") {
+                                    // Clear back stack to prevent navigating back to the same screen
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
+                        },
                         selectedContentColor = colorResource(id = R.color.green),
                         unselectedContentColor = colorResource(id = R.color.gray)
                     )
                     BottomNavigationItem(
-                        icon = { Icon(Icons.Filled.Email, contentDescription = "Saved") },
-                        label = { Text("Saved") },
-                        selected = currentRoute == "saved",
-                        onClick = { navController.navigate("saved") },
+                        icon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_seitting),
+                                contentDescription = "Setting"
+                            )
+                        },
+                        label = { Text("Setting") },
+                        selected = currentRoute == "setting",
+                        onClick = {
+                            if (currentRoute != "setting") {
+                                navController.navigate("setting") {
+                                    // Clear back stack to prevent navigating back to the same screen
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
+                        },
                         selectedContentColor = colorResource(id = R.color.green),
                         unselectedContentColor = colorResource(id = R.color.gray)
                     )
                     BottomNavigationItem(
-                        icon = { Icon(Icons.Filled.AccountCircle, contentDescription = "Account") },
+                        icon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_account),
+                                contentDescription = "Account"
+                            )
+                        },
                         label = { Text("Account") },
                         selected = currentRoute == "account",
-                        onClick = { navController.navigate("account") },
+                        onClick = {
+                            if (currentRoute != "account") {
+                                navController.navigate("account") {
+                                    // Clear back stack to prevent navigating back to the same screen
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
+                        },
                         selectedContentColor = colorResource(id = R.color.green),
                         unselectedContentColor = colorResource(id = R.color.gray)
                     )
@@ -97,7 +164,7 @@ class MainActivity : ComponentActivity() {
                 Modifier.padding(innerPadding)
             ) {
                 composable("home") { HomeScreen() }
-                composable("search") { SearchScreen() }
+                composable("search") { SearchScreen(navController = navController) }
                 composable("saved") { SavedScreen() }
                 composable("account") { AccountScreen() }
             }
