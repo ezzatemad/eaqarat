@@ -77,6 +77,7 @@ dependencies {
     implementation ("androidx.work:work-runtime-ktx:$work_version")
 
 
+    implementation("com.microsoft.signalr:signalr:6.0.0")
 }
 
 kapt {
