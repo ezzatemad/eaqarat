@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.domain.datamodel.getallproperty.DataItem
 import com.example.domain.usecases.filterproperty.GetFilterPropertyUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

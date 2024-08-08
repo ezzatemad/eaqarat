@@ -1,14 +1,9 @@
-package com.example.domain.datamodel.getallproperty
+package com.example.data.model
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
+import com.example.domain.datamodel.getallproperty.DataItem
 
 
-@Parcelize
-data class DataItem(
-
-    val id: Long? = null,
-
+data class FavouriteItem(
     val area: Double? = null,
 
     val price: Double? = null,
@@ -26,4 +21,5 @@ data class DataItem(
     val listedAt: String? = null,
 
     val status: String? = null
-) : Parcelable
+)
+

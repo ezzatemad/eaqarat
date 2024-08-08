@@ -41,5 +41,6 @@
     <string name="furnished">Furnetured</string>
     <string name="unfernetired">UnFernetired</string>
     <string name="title_activity_property_details">propertyDetailsActivity</string>
+    <string name="property_added_to_favorites">property added to favorites</string>
 
 </resources>

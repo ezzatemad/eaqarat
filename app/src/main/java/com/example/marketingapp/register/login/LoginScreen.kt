@@ -32,6 +32,7 @@ import com.example.marketingapp.R
 import com.example.marketingapp.TokenManager
 import com.example.marketingapp.register.signin.SignInButton
 import com.example.marketingapp.register.signin.SignInTextField
+import kotlin.math.log
 
 @Composable
 fun LoginScreen(
@@ -47,7 +48,8 @@ fun LoginScreen(
 
     LaunchedEffect(loginResponse) {
         loginResponse?.token?.let {
-            tokenManager.saveToken(loginResponse!!.token!!)
+            tokenManager.saveToken(loginResponse!!.token ?: "")
+            Log.d("TAG", "LoginScreen: ${tokenManager.getToken()}")
             Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
             // Navigate to HomeScreen or another activity
             val intent = Intent(context, MainActivity::class.java)
