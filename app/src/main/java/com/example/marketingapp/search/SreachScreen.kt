@@ -152,9 +152,13 @@ fun SearchScreen(navController: NavController, viewModel: HomeViewModel = hiltVi
                             location = property?.location ?: "",
                             date = property?.listedAt ?: "",
                             onClick = {
-                                val intent = Intent(context, PropertyDetailsActivity::class.java).apply {
-                                    putExtra("property", property) // Assuming `property` implements Parcelable or Serializable
-                                }
+                                val intent =
+                                    Intent(context, PropertyDetailsActivity::class.java).apply {
+                                        putExtra(
+                                            "property",
+                                            property
+                                        ) // Assuming `property` implements Parcelable or Serializable
+                                    }
                                 context.startActivity(intent)
                             }
                         )
@@ -431,8 +435,8 @@ fun PropertyCard(
                 if (hasImages) {
                     val painter = rememberAsyncImagePainter(
                         model = imageUrls[currentImageIndex],
-                        placeholder = painterResource(id = R.drawable.no_image_iv),
-                        error = painterResource(id = R.drawable.no_image_iv)
+                        placeholder = painterResource(id = R.drawable.no_image),
+                        error = painterResource(id = R.drawable.no_image)
                     )
                     val painterState = painter.state
 
@@ -449,7 +453,7 @@ fun PropertyCard(
 
                     Image(
                         painter = painter,
-                        contentDescription = "Property Image",
+                        contentDescription = "Property.sq Image",
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
@@ -482,10 +486,10 @@ fun PropertyCard(
                     }
                 } else {
                     Image(
-                        painter = painterResource(id = R.drawable.no_image_iv),
+                        painter = painterResource(id = R.drawable.no_image),
                         contentDescription = "No Image Available",
                         modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Fit
+                        contentScale = ContentScale.FillBounds
                     )
                 }
 

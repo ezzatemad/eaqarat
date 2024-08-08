@@ -6,37 +6,20 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
-import android.util.Log
-import androidx.compose.runtime.*
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.foundation.Image
-import dagger.hilt.android.AndroidEntryPoint
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.runtime.getValue
 import androidx.compose.material.*
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.navigation.NavType
 import androidx.navigation.compose.*
-import androidx.navigation.navArgument
-import com.example.domain.datamodel.getallproperty.DataItem
 import com.example.marketingapp.R
 import com.example.marketingapp.account.AccountScreen
 import com.example.marketingapp.home.HomeScreen
-import com.example.marketingapp.saved.SavedScreen
+import com.example.marketingapp.favorite.FavoriteScreen
 import com.example.marketingapp.search.SearchScreen
-
+import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -111,14 +94,14 @@ class MainActivity : ComponentActivity() {
                         icon = {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_seitting),
-                                contentDescription = "Setting"
+                                contentDescription = "favorite"
                             )
                         },
-                        label = { Text("Setting") },
-                        selected = currentRoute == "setting",
+                        label = { Text("Favorite") },
+                        selected = currentRoute == "favorite",
                         onClick = {
-                            if (currentRoute != "setting") {
-                                navController.navigate("setting") {
+                            if (currentRoute != "favorite") {
+                                navController.navigate("favorite") {
                                     // Clear back stack to prevent navigating back to the same screen
                                     popUpTo(navController.graph.startDestinationId) {
                                         saveState = true
@@ -165,7 +148,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 composable("home") { HomeScreen() }
                 composable("search") { SearchScreen(navController = navController) }
-                composable("saved") { SavedScreen() }
+                composable("favorite") { FavoriteScreen() }
                 composable("account") { AccountScreen() }
             }
         }

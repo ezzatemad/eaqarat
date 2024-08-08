@@ -1,6 +1,5 @@
 package com.example.data.repositoryimpl.getallpropert
 
-import android.media.session.MediaSession.Token
 import com.example.data.datasource.getallproperty.GetAllPropertyDataSource
 import com.example.domain.datamodel.getallproperty.PropertyResponse
 import com.example.domain.repository.getallproperty.GetAllPropertyRepo

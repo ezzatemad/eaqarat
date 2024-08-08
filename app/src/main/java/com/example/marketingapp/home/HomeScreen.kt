@@ -1,11 +1,17 @@
-@file:OptIn(ExperimentalMaterialApi::class)
-
 package com.example.marketingapp.home
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.runtime.Composable
-@Composable
-fun HomeScreen(){
 
+import android.util.Log
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import com.example.marketingapp.TokenManager
+import kotlin.math.log
+
+@Composable
+fun HomeScreen() {
+
+    val context = LocalContext.current
+    val tokenManager = TokenManager(context)
+    Log.d("TAG", "HomeScreen: ${tokenManager.getToken()}")
 }
 
 

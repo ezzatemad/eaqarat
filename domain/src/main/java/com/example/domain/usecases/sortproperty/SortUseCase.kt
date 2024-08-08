@@ -7,7 +7,6 @@ import javax.inject.Inject
 class SortUseCase @Inject constructor(
     private val sortRepo: SortRepo
 ) {
-
     suspend fun sort(token: String, sortBy: String, ascending: Boolean): SortResponse {
         return sortRepo.sort(token, sortBy, ascending)
     }

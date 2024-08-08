@@ -7,14 +7,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.domain.datamodel.register.signin.RegisterResponse
 import com.example.domain.datamodel.register.signin.User
 import com.example.domain.usecases.register.SignInUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class SignInViewModel @Inject constructor(
+class SignInViewModel(
     val signInUseCase: SignInUseCase
 ) : ViewModel() {
 

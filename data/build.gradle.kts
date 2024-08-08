@@ -4,6 +4,11 @@ plugins {
 
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
+    id("app.cash.sqldelight")
+//    id ("kotlin-serialization")
+    id ("kotlin-parcelize")
+
+
 }
 
 android {
@@ -78,8 +83,23 @@ dependencies {
 
 
     implementation("com.microsoft.signalr:signalr:6.0.0")
+
+    //SQLDelight
+    implementation("app.cash.sqldelight:android-driver:2.0.2")
+    implementation("app.cash.sqldelight:coroutines-extensions-jvm:2.0.2")
+    implementation("app.cash.sqldelight:android-driver:2.0.0-alpha05")
 }
 
 kapt {
     correctErrorTypes = true
+}
+
+
+// SQLDelight configuration
+sqldelight {
+    databases {
+        create("PropertyItem") {
+            packageName.set("com.example.data")
+        }
+    }
 }

@@ -23,50 +23,92 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.example.domain.datamodel.getallproperty.DataItem
 import com.example.marketingapp.Dimension
 import com.example.marketingapp.R
+import com.example.marketingapp.favorite.FavouritePropertyViewModel
 import com.example.marketingapp.search.formatDate
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class PropertyDetailsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             val property: DataItem? = intent.getParcelableExtra("property")
-            PropertyDetailsScreen(property)
+            val viewModel: FavouritePropertyViewModel = hiltViewModel()
+
+            // Check if the property is a favorite when the screen loads
+            property?.let {
+                viewModel.checkIfFavourite(it) // Ensure this method checks if the property is in favorites
+            }
+
+            PropertyDetailsScreen(viewModel = viewModel, property = property)
         }
     }
 }
 
 @Composable
-fun PropertyDetailsScreen(property: DataItem?) {
+fun PropertyDetailsScreen(viewModel: FavouritePropertyViewModel, property: DataItem?) {
     var currentImageIndex by remember { mutableStateOf(0) }
-    val hasImages = property?.imageUrl?.isNotEmpty() == true
+    val isFavourite by viewModel.isFavourite.collectAsState()
+    val snackbarMessage by viewModel.snackbarMessage.collectAsState()
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(bottom = 80.dp)
-        ) {
-            ImageSection(property, currentImageIndex, { currentImageIndex = it })
+    // State for Snackbar
+    val scaffoldState = rememberScaffoldState()
 
-            PropertyInfoSection(property)
+    // Show Snackbar based on snackbarMessage state
+    LaunchedEffect(snackbarMessage) {
+        snackbarMessage?.let {
+            scaffoldState.snackbarHostState.showSnackbar(
+                message = it,
+                duration = SnackbarDuration.Short
+            )
+            viewModel.resetSnackbarMessage() // Reset message after showing
         }
-        ContactRow(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .padding(16.dp)
-        )
     }
+
+    Scaffold(
+        scaffoldState = scaffoldState,
+        content = { padding ->
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                        .padding(bottom = 80.dp)
+                ) {
+                    ImageSection(
+                        property = property,
+                        currentImageIndex = currentImageIndex,
+                        onImageChange = { currentImageIndex = it },
+                        viewModel = viewModel
+                    )
+
+                    PropertyInfoSection(property)
+                }
+                ContactRow(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                )
+            }
+        }
+    )
 }
 
+
 @Composable
-fun ImageSection(property: DataItem?, currentImageIndex: Int, onImageChange: (Int) -> Unit) {
+fun ImageSection(
+    property: DataItem?,
+    viewModel: FavouritePropertyViewModel,
+    currentImageIndex: Int,
+    onImageChange: (Int) -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -75,8 +117,8 @@ fun ImageSection(property: DataItem?, currentImageIndex: Int, onImageChange: (In
         if (property?.imageUrl?.isNotEmpty() == true) {
             val painter = rememberAsyncImagePainter(
                 model = property.imageUrl!![currentImageIndex],
-                placeholder = painterResource(id = R.drawable.no_image_iv),
-                error = painterResource(id = R.drawable.no_image_iv)
+                placeholder = painterResource(id = R.drawable.no_image),
+                error = painterResource(id = R.drawable.no_image)
             )
             val painterState = painter.state
 
@@ -93,7 +135,7 @@ fun ImageSection(property: DataItem?, currentImageIndex: Int, onImageChange: (In
 
             Image(
                 painter = painter,
-                contentDescription = "Property Image",
+                contentDescription = "Property.sq Image",
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
@@ -103,7 +145,8 @@ fun ImageSection(property: DataItem?, currentImageIndex: Int, onImageChange: (In
                     val newIndex =
                         (currentImageIndex - 1).takeIf { it >= 0 } ?: (property.imageUrl!!.size - 1)
                     onImageChange(newIndex)
-                }, modifier = Modifier.align(Alignment.CenterStart)
+                },
+                modifier = Modifier.align(Alignment.CenterStart)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_arrow_left),
@@ -116,7 +159,8 @@ fun ImageSection(property: DataItem?, currentImageIndex: Int, onImageChange: (In
                 onClick = {
                     val newIndex = (currentImageIndex + 1) % property.imageUrl!!.size
                     onImageChange(newIndex)
-                }, modifier = Modifier.align(Alignment.CenterEnd)
+                },
+                modifier = Modifier.align(Alignment.CenterEnd)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_arrow_right),
@@ -136,7 +180,7 @@ fun ImageSection(property: DataItem?, currentImageIndex: Int, onImageChange: (In
                     Box(
                         modifier = Modifier
                             .padding(horizontal = 2.dp)
-                            .size(8.dp)
+                            .size(height = 8.dp, width = 12.dp)
                             .background(
                                 if (index == currentImageIndex) colorResource(id = R.color.green) else colorResource(
                                     id = R.color.gray
@@ -146,15 +190,72 @@ fun ImageSection(property: DataItem?, currentImageIndex: Int, onImageChange: (In
                 }
             }
         } else {
-            Image(
-                painter = painterResource(id = R.drawable.no_image_iv),
-                contentDescription = "No Image Available",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Fit
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(Dimension.LargeImageHeight)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.no_image),
+                    contentDescription = "No Image Available",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.FillBounds
+                )
+            }
+            TopIconsRow(viewModel = viewModel, property = property)
+        }
+
+        // Top icons row
+        TopIconsRow(viewModel = viewModel, property = property)
+    }
+}
+
+@Composable
+fun TopIconsRow(viewModel: FavouritePropertyViewModel, property: DataItem?) {
+    val isFavourite by viewModel.isFavourite.collectAsState()
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(onClick = { /* Handle back action */ }) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_arrow_left),
+                contentDescription = "Back",
+                tint = Color.Black
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        IconButton(onClick = { /* Handle action 1 */ }) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_email),
+                contentDescription = "Action 1",
+                tint = Color.Green
+            )
+        }
+        IconButton(onClick = {
+            property?.let {
+                viewModel.toggleFavouriteStatus(it)
+            }
+        }) {
+            Icon(
+                painter = painterResource(
+                    id = if (isFavourite) {
+                        R.drawable.ic_favorite_red // Filled favorite icon
+                    } else {
+                        R.drawable.ic_favorite_white // Border favorite icon
+                    }
+                ),
+                contentDescription = "Favourite",
+                tint = if (isFavourite) Color.Red else Color.White,
             )
         }
     }
 }
+
 
 @Composable
 fun PropertyInfoSection(property: DataItem?) {
@@ -230,7 +331,7 @@ fun PropertyInfoSection(property: DataItem?) {
         )
         Column(modifier = Modifier.padding(top = Dimension.LargePadding)) {
             Text(
-                text = "Property Information",
+                text = "Property.sq Information",
                 fontWeight = FontWeight.Bold,
                 fontSize = Dimension.MediumFontSize,
                 color = Color.Black,
@@ -246,6 +347,7 @@ fun PropertyInfoSection(property: DataItem?) {
         }
     }
 }
+
 @Composable
 fun ContactRow(modifier: Modifier = Modifier) {
     Row(
@@ -281,16 +383,24 @@ fun ContactOption(iconRes: Int, text: String?, modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxWidth()
             .background(
-                color = colorResource(id = R.color.green2), shape = RoundedCornerShape(Dimension.LargeCornerRadius)
+                color = colorResource(id = R.color.green2),
+                shape = RoundedCornerShape(Dimension.LargeCornerRadius)
             )
             .padding(Dimension.SmallPadding)
-            .border(1.dp, Color.Transparent, shape = RoundedCornerShape(Dimension.LargeCornerRadius)),
+            .border(
+                1.dp,
+                Color.Transparent,
+                shape = RoundedCornerShape(Dimension.LargeCornerRadius)
+            ),
         contentAlignment = Alignment.Center
     ) {
         Row(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = Dimension.MediumPadding, vertical = Dimension.SmallPadding)
+            modifier = Modifier.padding(
+                horizontal = Dimension.MediumPadding,
+                vertical = Dimension.SmallPadding
+            )
         ) {
             Icon(
                 painter = painterResource(id = iconRes),
