@@ -17,51 +17,71 @@ import javax.inject.Inject
 class FavouritePropertyViewModel @Inject constructor(
     private val localDataBaseUseCase: LocalDataBaseUseCase
 ) : ViewModel() {
-
-    private val _isFavourite = MutableStateFlow<Boolean>(false)
+    private val _isFavourite = MutableStateFlow(false)
     val isFavourite: StateFlow<Boolean> get() = _isFavourite
 
     private val _propertyList = MutableStateFlow<List<DataItem>>(emptyList())
     val propertyList: StateFlow<List<DataItem>> get() = _propertyList
 
     private val _snackbarMessage = MutableStateFlow<String?>(null)
-    val snackbarMessage: StateFlow<String?> = _snackbarMessage.asStateFlow()
+    val snackbarMessage: StateFlow<String?> get() = _snackbarMessage.asStateFlow()
+
+
+
+    fun removeFavorite(property: DataItem) {
+        viewModelScope.launch {
+            localDataBaseUseCase.deletePropertyById(property.id!!) // Remove from database
+            // Refresh the list
+            getAllProperties()
+        }
+    }
+
 
     fun toggleFavouriteStatus(property: DataItem) {
         viewModelScope.launch {
-            if (_isFavourite.value) {
-                // Remove from favorites
-                localDataBaseUseCase.deletePropertyById(property.id!!)
-                _isFavourite.value = false
-                _snackbarMessage.value = "Property removed from favorites"
-            } else {
-                // Add to favorites
-                localDataBaseUseCase.insertProperty(
-                    id = property.id!!,
-                    area = property.area.toString(),
-                    propertyType = property.propertyType.toString(),
-                    listedAt = property.listedAt.toString(),
-                    title = property.title.toString(),
-                    description = property.description.toString(),
-                    location = property.location.toString(),
-                    status = property.status.toString(),
-                    price = property.price.toString(),
-                    imageUrl = property.imageUrl.toString()
-                )
-                _isFavourite.value = true
-                _snackbarMessage.value = "Property added to favorites"
+            try {
+                if (_isFavourite.value) {
+                    // Remove from favorites
+                    localDataBaseUseCase.deletePropertyById(property.id!!)
+                    _isFavourite.value = false
+                    _snackbarMessage.value = "Property removed from favorites"
+                } else {
+                    // Add to favorites
+                    localDataBaseUseCase.insertProperty(
+                        id = property.id!!,
+                        area = property.area?.toString() ?: "",
+                        price = property.price?.toString() ?: "",
+                        propertyType = property.propertyType ?: "",
+                        images = property.imageUrl?.filterNotNull() ?: emptyList(), // Filter out nulls
+                        description = property.description ?: "",
+                        location = property.location ?: "",
+                        title = property.title ?: "",
+                        listedAt = property.listedAt ?: "",
+                        status = property.status ?: ""
+                    )
+                    _isFavourite.value = true
+                    _snackbarMessage.value = "Property added to favorites"
+                }
+            } catch (ex: Exception) {
+                Log.d("TAG", "toggleFavouriteStatus: ${ex.localizedMessage}")
+                _snackbarMessage.value = "Error updating favorite status"
             }
         }
     }
 
     fun checkIfFavourite(property: DataItem) {
         viewModelScope.launch {
-            val isFavourite = localDataBaseUseCase.isPropertyFavourite(property.id!!)
-            _isFavourite.value = isFavourite
+            try {
+                val isFavourite = localDataBaseUseCase.isPropertyFavourite(property.id!!)
+                _isFavourite.value = isFavourite
+            } catch (ex: Exception) {
+                Log.d("TAG", "checkIfFavourite: ${ex.localizedMessage}")
+                _isFavourite.value = false
+            }
         }
     }
 
-    fun getAllroperties() {
+    fun getAllProperties() {
         viewModelScope.launch {
             try {
                 val properties = localDataBaseUseCase.getAllProperty()

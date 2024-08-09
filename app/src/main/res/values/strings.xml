@@ -42,5 +42,6 @@
     <string name="unfernetired">UnFernetired</string>
     <string name="title_activity_property_details">propertyDetailsActivity</string>
     <string name="property_added_to_favorites">property added to favorites</string>
+    <string name="property_removed_from_favorites">Property removed from favorites</string>
 
 </resources>

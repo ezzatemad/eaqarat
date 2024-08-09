@@ -14,7 +14,7 @@ class LocalDataBaseUseCase @Inject constructor(
         area: String,
         price: String,
         propertyType: String,
-        imageUrl: String,
+        images: List<String>, // Updated to accept a list of image URLs
         description: String,
         location: String,
         title: String,
@@ -27,7 +27,7 @@ class LocalDataBaseUseCase @Inject constructor(
                 area,
                 price,
                 propertyType,
-                imageUrl,
+                images, // Pass the list of images
                 description,
                 location,
                 title,
@@ -40,17 +40,17 @@ class LocalDataBaseUseCase @Inject constructor(
     }
 
     suspend fun getAllProperty(): List<DataItem> {
-        try {
-            return localDataBaseRepo.getAllProperty()
+        return try {
+            localDataBaseRepo.getAllProperty()
         } catch (ex: Exception) {
-            throw ex
+            Log.d("TAG", "getAllProperty: ${ex.localizedMessage}")
+            emptyList() // Return an empty list or handle as needed
         }
     }
 
     suspend fun deletePropertyById(propertyId: Long) {
         try {
             localDataBaseRepo.deletePropertyById(propertyId)
-
         } catch (ex: Exception) {
             Log.d("TAG", "deletePropertyById: ${ex.localizedMessage}")
         }

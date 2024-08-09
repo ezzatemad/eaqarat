@@ -154,10 +154,9 @@ fun SearchScreen(navController: NavController, viewModel: HomeViewModel = hiltVi
                             onClick = {
                                 val intent =
                                     Intent(context, PropertyDetailsActivity::class.java).apply {
-                                        putExtra(
-                                            "property",
-                                            property
-                                        ) // Assuming `property` implements Parcelable or Serializable
+                                        putExtra("property", property)
+                                        putExtra("source", "search")
+
                                     }
                                 context.startActivity(intent)
                             }

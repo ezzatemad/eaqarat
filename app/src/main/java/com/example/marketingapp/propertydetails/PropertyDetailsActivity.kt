@@ -1,5 +1,6 @@
 package com.example.marketingapp.propertydetails
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -39,35 +41,44 @@ class PropertyDetailsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val property: DataItem? = intent.getParcelableExtra("property")
+            val source: String? = intent.getStringExtra("source")
             val viewModel: FavouritePropertyViewModel = hiltViewModel()
 
-            // Check if the property is a favorite when the screen loads
+
             property?.let {
-                viewModel.checkIfFavourite(it) // Ensure this method checks if the property is in favorites
+                viewModel.checkIfFavourite(it)
             }
 
-            PropertyDetailsScreen(viewModel = viewModel, property = property)
+            PropertyDetailsScreen(
+                viewModel = viewModel,
+                property = property,
+                source = source
+            )
         }
     }
 }
 
+
 @Composable
-fun PropertyDetailsScreen(viewModel: FavouritePropertyViewModel, property: DataItem?) {
+fun PropertyDetailsScreen(
+    viewModel: FavouritePropertyViewModel,
+    property: DataItem?,
+    source: String?
+) {
     var currentImageIndex by remember { mutableStateOf(0) }
     val isFavourite by viewModel.isFavourite.collectAsState()
     val snackbarMessage by viewModel.snackbarMessage.collectAsState()
+    val context = LocalContext.current
 
-    // State for Snackbar
     val scaffoldState = rememberScaffoldState()
 
-    // Show Snackbar based on snackbarMessage state
     LaunchedEffect(snackbarMessage) {
         snackbarMessage?.let {
             scaffoldState.snackbarHostState.showSnackbar(
                 message = it,
                 duration = SnackbarDuration.Short
             )
-            viewModel.resetSnackbarMessage() // Reset message after showing
+            viewModel.resetSnackbarMessage()
         }
     }
 
@@ -88,13 +99,23 @@ fun PropertyDetailsScreen(viewModel: FavouritePropertyViewModel, property: DataI
                         viewModel = viewModel
                     )
 
-                    PropertyInfoSection(property)
+                    if (source == "search") {
+                        // Display additional or different information for "search" source
+                        PropertyInfoSection(property)
+                    } else if (source == "favorites") {
+                        // Display additional or different information for "favorites" source
+                        PropertyInfoSection(property)
+                    } else {
+                        // Default or fallback content
+                        PropertyInfoSection(property)
+                    }
                 }
                 ContactRow(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(16.dp),
+                    source = source
                 )
             }
         }
@@ -205,7 +226,7 @@ fun ImageSection(
             TopIconsRow(viewModel = viewModel, property = property)
         }
 
-        // Top icons row
+
         TopIconsRow(viewModel = viewModel, property = property)
     }
 }
@@ -213,6 +234,7 @@ fun ImageSection(
 @Composable
 fun TopIconsRow(viewModel: FavouritePropertyViewModel, property: DataItem?) {
     val isFavourite by viewModel.isFavourite.collectAsState()
+    val context = LocalContext.current
 
     Row(
         modifier = Modifier
@@ -221,11 +243,13 @@ fun TopIconsRow(viewModel: FavouritePropertyViewModel, property: DataItem?) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = { /* Handle back action */ }) {
+        IconButton(onClick = {
+            (context as? Activity)?.finish()
+        }) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_arrow_left),
                 contentDescription = "Back",
-                tint = Color.Black
+                tint = Color.White
             )
         }
         Spacer(modifier = Modifier.weight(1f))
@@ -233,7 +257,7 @@ fun TopIconsRow(viewModel: FavouritePropertyViewModel, property: DataItem?) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_email),
                 contentDescription = "Action 1",
-                tint = Color.Green
+                tint = Color.White
             )
         }
         IconButton(onClick = {
@@ -244,9 +268,9 @@ fun TopIconsRow(viewModel: FavouritePropertyViewModel, property: DataItem?) {
             Icon(
                 painter = painterResource(
                     id = if (isFavourite) {
-                        R.drawable.ic_favorite_red // Filled favorite icon
+                        R.drawable.ic_favorite_red
                     } else {
-                        R.drawable.ic_favorite_white // Border favorite icon
+                        R.drawable.ic_favorite_white
                     }
                 ),
                 contentDescription = "Favourite",
@@ -331,7 +355,7 @@ fun PropertyInfoSection(property: DataItem?) {
         )
         Column(modifier = Modifier.padding(top = Dimension.LargePadding)) {
             Text(
-                text = "Property.sq Information",
+                text = "Property Information",
                 fontWeight = FontWeight.Bold,
                 fontSize = Dimension.MediumFontSize,
                 color = Color.Black,
@@ -349,7 +373,7 @@ fun PropertyInfoSection(property: DataItem?) {
 }
 
 @Composable
-fun ContactRow(modifier: Modifier = Modifier) {
+fun ContactRow(modifier: Modifier = Modifier, source: String?) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -358,13 +382,13 @@ fun ContactRow(modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         ContactOption(
-            iconRes = R.drawable.ic_email,
+            iconRes = if (source == "search") R.drawable.ic_email else R.drawable.ic_email,
             text = "Mail",
             modifier = Modifier.weight(1f)
         )
         Spacer(modifier = Modifier.width(Dimension.MediumPadding))
         ContactOption(
-            iconRes = R.drawable.ic_email,
+            iconRes = if (source == "search") R.drawable.ic_email else R.drawable.ic_email,
             text = "Call",
             modifier = Modifier.weight(1f)
         )
@@ -376,6 +400,7 @@ fun ContactRow(modifier: Modifier = Modifier) {
         )
     }
 }
+
 
 @Composable
 fun ContactOption(iconRes: Int, text: String?, modifier: Modifier = Modifier) {
@@ -433,3 +458,4 @@ fun PropertyInfoRow(label: String, value: String) {
         )
     }
 }
+
