@@ -1,0 +1,65 @@
+CREATE TABLE IF NOT EXISTS property_item(
+    id INTEGER PRIMARY KEY,
+    area TEXT,
+    price TEXT,
+    propertyType TEXT,
+    description TEXT,
+    location TEXT,
+    title TEXT,
+    listedAt TEXT,
+    status TEXT
+);
+
+CREATE TABLE IF NOT EXISTS property_images_item (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    property_id INTEGER,
+    imageUrl TEXT,
+    FOREIGN KEY (property_id) REFERENCES property_item(id) ON DELETE CASCADE
+);
+
+
+
+insertDataItem:
+INSERT INTO property_item (
+    id, area, price, propertyType, description, location, title, listedAt, status
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+InsertImages:
+INSERT INTO property_images_item (property_id, imageUrl) VALUES (?, ?);
+
+
+selectAllDataItems:
+SELECT * FROM property_item;
+
+selectAllImages:
+SELECT * FROM property_images_item;
+
+
+
+selectDataItemById:
+SELECT * FROM property_item WHERE id = ?;
+
+selectImagesByPropertyId:
+SELECT * FROM property_images_item WHERE property_id = ?;
+
+
+deleteDataItemById:
+DELETE FROM property_item WHERE id = ?;
+
+deleteImagesByPropertyId:
+DELETE FROM property_images_item WHERE property_id = ?;
+
+deleteImageById:
+DELETE FROM property_images_item WHERE id = ?;
+
+
+updateDataItemById:
+UPDATE property_item
+SET
+    area = ?, price = ?, propertyType = ?, description = ?, location = ?, title = ?, listedAt = ?, status = ?
+WHERE id = ?;
+
+updateImageById:
+UPDATE property_images_item
+SET imageUrl = ?
+WHERE id = ?;

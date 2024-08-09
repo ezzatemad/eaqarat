@@ -8,7 +8,7 @@ interface LocalDataBaseRepo {
         area: String,
         price: String,
         propertyType: String,
-        imageUrl: String,
+        images: List<String>, // Updated from String to List<String>
         description: String,
         location: String,
         title: String,
@@ -19,7 +19,6 @@ interface LocalDataBaseRepo {
     suspend fun getAllProperty(): List<DataItem>
 
     suspend fun deletePropertyById(propertyId: Long)
-
 
     suspend fun isPropertyFavourite(propertyId: Long): Boolean
 }

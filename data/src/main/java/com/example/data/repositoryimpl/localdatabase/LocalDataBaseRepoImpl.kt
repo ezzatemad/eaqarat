@@ -9,12 +9,13 @@ import javax.inject.Inject
 class LocalDataBaseRepoImpl @Inject constructor(
     private val localDataBaseDataSource: LocalDataBaseDataSource
 ) : LocalDataBaseRepo {
+
     override suspend fun insertProperty(
         id: Long,
         area: String,
         price: String,
         propertyType: String,
-        imageUrl: String,
+        images: List<String>,
         description: String,
         location: String,
         title: String,
@@ -22,12 +23,13 @@ class LocalDataBaseRepoImpl @Inject constructor(
         status: String
     ) {
         try {
+            // Insert property details
             localDataBaseDataSource.insertProperty(
                 id,
                 area,
                 price,
                 propertyType,
-                imageUrl,
+                images, // Pass the list of images
                 description,
                 location,
                 title,
@@ -44,10 +46,20 @@ class LocalDataBaseRepoImpl @Inject constructor(
     }
 
     override suspend fun deletePropertyById(propertyId: Long) {
-        localDataBaseDataSource.deletePropertyById(propertyId)
+        try {
+            // Delete the property and its associated images
+            localDataBaseDataSource.deletePropertyById(propertyId)
+        } catch (ex: Exception) {
+            Log.d("TAG", "deletePropertyById: ${ex.localizedMessage}")
+        }
     }
 
     override suspend fun isPropertyFavourite(propertyId: Long): Boolean {
-        return localDataBaseDataSource.isPropertyFavourite(propertyId)
+        return try {
+            localDataBaseDataSource.isPropertyFavourite(propertyId)
+        } catch (ex: Exception) {
+            Log.d("TAG", "isPropertyFavourite: ${ex.localizedMessage}")
+            false
+        }
     }
 }

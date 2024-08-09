@@ -1,7 +1,6 @@
 package com.example.marketingapp.favorite
 
 import android.content.Intent
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,18 +23,24 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarHost
 import androidx.compose.material.Text
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -49,46 +54,65 @@ import com.example.domain.datamodel.getallproperty.DataItem
 import com.example.marketingapp.Dimension
 import com.example.marketingapp.R
 import com.example.marketingapp.propertydetails.PropertyDetailsActivity
-import com.example.marketingapp.propertydetails.TopIconsRow
-import com.example.marketingapp.search.PropertyCard
 import com.example.marketingapp.search.formatDate
+import kotlinx.coroutines.launch
 
 @Composable
 fun FavoriteScreen(viewModel: FavouritePropertyViewModel = hiltViewModel()) {
-
     val context = LocalContext.current
-    // Fetch all properties when the activity is created
-    LaunchedEffect(Unit) {
-        viewModel.getAllroperties() // Ensure the correct method name is used
+    val scaffoldState = rememberScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
+
+    var refreshTrigger by remember { mutableStateOf(Unit) }
+
+    LaunchedEffect(refreshTrigger) {
+        viewModel.getAllProperties()
     }
 
-    // Collect the properties and log them
     val propertyList by viewModel.propertyList.collectAsState()
-    LaunchedEffect(propertyList) {
-        Log.d("PropertyDetailsActivity", "Properties in local database: $propertyList")
-    }
 
-    LazyColumn {
-        items(propertyList) { property ->
-            FavoritePropertyCard(
-                imageUrls = property.imageUrl ?: emptyList(),
-                price = property.price.toString(),
-                title = property.title ?: "Unknown",
-                description = property.description ?: "Unknown",
-                area = property.area ?: 0.0,
-                location = property.location ?: "Unknown",
-                date = property.listedAt ?: "Unknown",
-                property = property,
-                viewModel = viewModel
-            ) {
-                val intent = Intent(context, PropertyDetailsActivity::class.java).apply {
-                    putExtra("Favourite Property", property) // Ensure proper data passing
-                }
-                context.startActivity(intent)
+    Scaffold(
+        scaffoldState = scaffoldState,
+        snackbarHost = {
+            SnackbarHost(it) { data ->
+                Snackbar(snackbarData = data)
+            }
+        }
+    ) { contentPadding ->
+        LazyColumn(
+            contentPadding = contentPadding
+        ) {
+            items(propertyList) { property ->
+                FavoritePropertyCard(
+                    imageUrls = property.imageUrl?.filterNotNull() ?: emptyList(),
+                    price = property.price.toString(),
+                    title = property.title ?: "Unknown",
+                    description = property.description ?: "Unknown",
+                    area = property.area ?: 0.0,
+                    location = property.location ?: "Unknown",
+                    date = property.listedAt ?: "Unknown",
+                    property = property,
+                    viewModel = viewModel,
+                    onClick = {
+                        val intent = Intent(context, PropertyDetailsActivity::class.java).apply {
+                            putExtra("property", property)
+                            putExtra("source", "favorite")
+                        }
+                        context.startActivity(intent)
+                    },
+                    onRemoveFavorite = {
+                        viewModel.removeFavorite(property)
+                        refreshTrigger = Unit
+                        coroutineScope.launch {
+                            scaffoldState.snackbarHostState.showSnackbar(context.getString(R.string.property_removed_from_favorites))
+                        }
+                    }
+                )
             }
         }
     }
 }
+
 
 @Composable
 fun FavoritePropertyCard(
@@ -99,10 +123,10 @@ fun FavoritePropertyCard(
     area: Double,
     location: String,
     date: String,
-    property: DataItem?, // Add this parameter
-    viewModel: FavouritePropertyViewModel, // Add this parameter
+    property: DataItem?,
+    viewModel: FavouritePropertyViewModel,
     onClick: () -> Unit,
-//    onLongClick: () -> Unit
+    onRemoveFavorite: () -> Unit
 ) {
     var currentImageIndex by remember { mutableStateOf(0) }
     val hasImages = imageUrls.isNotEmpty()
@@ -118,99 +142,109 @@ fun FavoritePropertyCard(
             )
             .fillMaxWidth()
             .clickable(onClick = onClick)
-//            .pointerInput(Unit) {
-//                detectTapGestures(
-//                    onLongPress = {
-//                        onLongClick() // Call the long click callback
-//                    }
-//                )
-//            }
     ) {
         Column {
-            TopIconsRow(viewModel, property) // Add TopIconsRow here
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(Dimension.MediumImageHeight)
             ) {
-                if (hasImages) {
-                    val painter = rememberAsyncImagePainter(
-                        model = imageUrls[currentImageIndex],
-                        placeholder = painterResource(id = R.drawable.no_image),
-                        error = painterResource(id = R.drawable.no_image)
-                    )
-                    val painterState = painter.state
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ) {
 
-                    if (painterState is AsyncImagePainter.State.Loading) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color.Black.copy(alpha = 0.5f)),
-                            contentAlignment = Alignment.Center
+                    if (hasImages) {
+                        val painter = rememberAsyncImagePainter(
+                            model = imageUrls[currentImageIndex],
+                            placeholder = painterResource(id = R.drawable.no_image),
+                            error = painterResource(id = R.drawable.no_image)
+                        )
+                        val painterState = painter.state
+
+                        if (painterState is AsyncImagePainter.State.Loading) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(Color.Black.copy(alpha = 0.5f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(color = Color.White)
+                            }
+                        }
+
+                        Image(
+                            painter = painter,
+                            contentDescription = "Property Image",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+
+                        IconButton(
+                            onClick = {
+                                currentImageIndex =
+                                    (currentImageIndex - 1).takeIf { it >= 0 }
+                                        ?: (imageUrls.size - 1)
+                            },
+                            modifier = Modifier.align(Alignment.CenterStart)
                         ) {
-                            CircularProgressIndicator(color = Color.White)
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_arrow_left),
+                                contentDescription = "Previous Image",
+                                tint = Color.White
+                            )
+                        }
+
+                        IconButton(
+                            onClick = {
+                                currentImageIndex = (currentImageIndex + 1) % imageUrls.size
+                            },
+                            modifier = Modifier.align(Alignment.CenterEnd)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_arrow_right),
+                                contentDescription = "Next Image",
+                                tint = Color.White
+                            )
+                        }
+                    } else {
+                        Image(
+                            painter = painterResource(id = R.drawable.no_image),
+                            contentDescription = "No Image Available",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        imageUrls.forEachIndexed { index, _ ->
+                            Box(
+                                modifier = Modifier
+                                    .padding(horizontal = 2.dp)
+                                    .size(8.dp)
+                                    .background(
+                                        if (index == currentImageIndex) colorResource(id = R.color.green2) else colorResource(
+                                            id = R.color.gray
+                                        ), shape = RoundedCornerShape(4.dp)
+                                    )
+                            )
                         }
                     }
 
-                    Image(
-                        painter = painter,
-                        contentDescription = "Property.sq Image",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-
-                    IconButton(
-                        onClick = {
-                            currentImageIndex =
-                                (currentImageIndex - 1).takeIf { it >= 0 } ?: (imageUrls.size - 1)
-                        },
-                        modifier = Modifier.align(Alignment.CenterStart)
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(8.dp)
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_arrow_left),
-                            contentDescription = "Previous Image",
-                            tint = Color.White
-                        )
-                    }
-
-                    IconButton(
-                        onClick = {
-                            currentImageIndex = (currentImageIndex + 1) % imageUrls.size
-                        },
-                        modifier = Modifier.align(Alignment.CenterEnd)
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_arrow_right),
-                            contentDescription = "Next Image",
-                            tint = Color.White
-                        )
-                    }
-                } else {
-                    Image(
-                        painter = painterResource(id = R.drawable.no_image),
-                        contentDescription = "No Image Available",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.FillBounds
-                    )
-                }
-
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(8.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    imageUrls.forEachIndexed { index, _ ->
-                        Box(
-                            modifier = Modifier
-                                .padding(horizontal = 2.dp)
-                                .size(8.dp)
-                                .background(
-                                    if (index == currentImageIndex) colorResource(id = R.color.green2) else colorResource(
-                                        id = R.color.gray
-                                    ), shape = RoundedCornerShape(4.dp)
-                                )
+                        FavoriteTopIconsRow(
+                            viewModel = viewModel,
+                            property = property,
+                            onRemoveFavorite = onRemoveFavorite
                         )
                     }
                 }
@@ -238,7 +272,7 @@ fun FavoritePropertyCard(
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_area),
-                        contentDescription = "Location Icon",
+                        contentDescription = "Area Icon",
                         tint = Color.Gray,
                     )
                     Spacer(modifier = Modifier.width(4.dp))
@@ -294,3 +328,44 @@ fun FavoritePropertyCard(
         }
     }
 }
+
+
+@Composable
+fun FavoriteTopIconsRow(
+    viewModel: FavouritePropertyViewModel,
+    property: DataItem?,
+    onRemoveFavorite: () -> Unit
+) {
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(onClick = { /* Handle action 1 */ }) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_email),
+                contentDescription = "Action 1",
+                tint = Color.White
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+
+        IconButton(onClick = {
+            property?.let {
+                viewModel.removeFavorite(it)
+                onRemoveFavorite()
+            }
+        }) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_favorite_red),
+                contentDescription = "Favorite",
+                tint = Color.Red,
+            )
+        }
+    }
+}
+
+
