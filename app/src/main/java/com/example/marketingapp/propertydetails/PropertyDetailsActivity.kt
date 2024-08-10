@@ -1,12 +1,16 @@
 package com.example.marketingapp.propertydetails
 
 import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -40,8 +44,10 @@ class PropertyDetailsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+
+
             val property: DataItem? = intent.getParcelableExtra("property")
-            val source: String? = intent.getStringExtra("source")
+            val source: String? = intent.getStringExtra("source") ?: ""
             val viewModel: FavouritePropertyViewModel = hiltViewModel()
 
 
@@ -115,7 +121,7 @@ fun PropertyDetailsScreen(
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth()
                         .padding(16.dp),
-                    source = source
+                    source = source,
                 )
             }
         }
@@ -138,8 +144,8 @@ fun ImageSection(
         if (property?.imageUrl?.isNotEmpty() == true) {
             val painter = rememberAsyncImagePainter(
                 model = property.imageUrl!![currentImageIndex],
-                placeholder = painterResource(id = R.drawable.no_image),
-                error = painterResource(id = R.drawable.no_image)
+                placeholder = painterResource(id = R.drawable.black),
+                error = painterResource(id = R.drawable.black)
             )
             val painterState = painter.state
 
@@ -170,7 +176,7 @@ fun ImageSection(
                 modifier = Modifier.align(Alignment.CenterStart)
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_arrow_left),
+                    painter = painterResource(id = R.drawable.arrow_back),
                     contentDescription = "Previous Image",
                     tint = Color.White
                 )
@@ -217,7 +223,7 @@ fun ImageSection(
                     .height(Dimension.LargeImageHeight)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.no_image),
+                    painter = painterResource(id = R.drawable.black),
                     contentDescription = "No Image Available",
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.FillBounds
@@ -236,6 +242,20 @@ fun TopIconsRow(viewModel: FavouritePropertyViewModel, property: DataItem?) {
     val isFavourite by viewModel.isFavourite.collectAsState()
     val context = LocalContext.current
 
+    fun shareProperty() {
+        val propertyId = property?.id // Ensure the property has a unique identifier
+        val shareUrl = "https://www.example.com/property/${property?.title}"
+        val shareText = "Check out this property: $shareUrl"
+
+        val shareIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, shareText)
+            type = "text/plain"
+        }
+        context.startActivity(Intent.createChooser(shareIntent, "Share property"))
+    }
+
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -253,10 +273,12 @@ fun TopIconsRow(viewModel: FavouritePropertyViewModel, property: DataItem?) {
             )
         }
         Spacer(modifier = Modifier.weight(1f))
-        IconButton(onClick = { /* Handle action 1 */ }) {
+        IconButton(onClick = {
+            shareProperty()
+        }) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_email),
-                contentDescription = "Action 1",
+                painter = painterResource(id = R.drawable.ic_share),
+                contentDescription = "Share",
                 tint = Color.White
             )
         }
@@ -374,6 +396,7 @@ fun PropertyInfoSection(property: DataItem?) {
 
 @Composable
 fun ContactRow(modifier: Modifier = Modifier, source: String?) {
+    val context = LocalContext.current
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -384,39 +407,64 @@ fun ContactRow(modifier: Modifier = Modifier, source: String?) {
         ContactOption(
             iconRes = if (source == "search") R.drawable.ic_email else R.drawable.ic_email,
             text = "Mail",
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
+            onClick = {
+                val emailIntent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/html"
+                    putExtra(Intent.EXTRA_EMAIL, arrayOf("ezatemad1221@gmail.com"))
+                    putExtra(Intent.EXTRA_SUBJECT, "")
+                    putExtra(Intent.EXTRA_TEXT, "")
+                }
+                context.startActivity(Intent.createChooser(emailIntent, "Send Email"))
+            }
         )
         Spacer(modifier = Modifier.width(Dimension.MediumPadding))
         ContactOption(
-            iconRes = if (source == "search") R.drawable.ic_email else R.drawable.ic_email,
+            iconRes = if (source == "search") R.drawable.ic_phone_green else R.drawable.ic_phone_green,
             text = "Call",
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
+            onClick = {
+                val phoneIntent = Intent(Intent.ACTION_DIAL).apply {
+                    data = Uri.parse("tel:01552557999") // Replace with the actual phone number
+                }
+                context.startActivity(phoneIntent)
+            }
         )
         Spacer(modifier = Modifier.width(Dimension.MediumPadding))
         ContactOption(
             iconRes = R.drawable.ic_email,
             text = null,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
+            onClick = {
+                val whatsappIntent = Intent(Intent.ACTION_VIEW).apply {
+                    data =
+                        Uri.parse("https://wa.me/1552557999") // Replace with the actual WhatsApp number
+                }
+                context.startActivity(whatsappIntent)
+            }
         )
     }
 }
 
 
 @Composable
-fun ContactOption(iconRes: Int, text: String?, modifier: Modifier = Modifier) {
+fun ContactOption(iconRes: Int, text: String?, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Box(
+
         modifier = modifier
             .fillMaxWidth()
             .background(
                 color = colorResource(id = R.color.green2),
                 shape = RoundedCornerShape(Dimension.LargeCornerRadius)
             )
+
             .padding(Dimension.SmallPadding)
             .border(
                 1.dp,
                 Color.Transparent,
                 shape = RoundedCornerShape(Dimension.LargeCornerRadius)
-            ),
+            )
+            .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Row(
@@ -458,4 +506,5 @@ fun PropertyInfoRow(label: String, value: String) {
         )
     }
 }
+
 

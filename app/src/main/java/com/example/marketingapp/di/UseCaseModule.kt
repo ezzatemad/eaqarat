@@ -4,18 +4,21 @@ import com.example.domain.repository.filterproperty.GetFilterPropertyRepo
 import com.example.domain.repository.getallproperty.GetAllPropertyRepo
 import com.example.domain.repository.localdatabase.LocalDataBaseRepo
 import com.example.domain.repository.register.LoginRepo
+import com.example.domain.repository.register.SignInRepo
 import com.example.domain.repository.search.SearchRepo
 import com.example.domain.repository.sort.SortRepo
 import com.example.domain.usecases.filterproperty.GetFilterPropertyUseCase
 import com.example.domain.usecases.getallproperty.GetAllPropertyUseCase
 import com.example.domain.usecases.locadatabase.LocalDataBaseUseCase
 import com.example.domain.usecases.register.LoginUseCase
+import com.example.domain.usecases.register.SignInUseCase
 import com.example.domain.usecases.search.SearchUseCase
 import com.example.domain.usecases.sortproperty.SortUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import kotlin.math.sign
 
 @Module
 @InstallIn(ViewModelComponent::class)
@@ -49,5 +52,10 @@ object UseCaseModule {
     @Provides
     fun provideLoginUseCase(loginRepo: LoginRepo): LoginUseCase {
         return LoginUseCase(loginRepo)
+    }
+
+    @Provides
+    fun provideSignInUseCase(signInRepo: SignInRepo): SignInUseCase {
+        return SignInUseCase(signInRepo)
     }
 }
