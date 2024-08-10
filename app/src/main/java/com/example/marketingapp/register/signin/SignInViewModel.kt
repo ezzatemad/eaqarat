@@ -7,12 +7,15 @@ import androidx.lifecycle.viewModelScope
 import com.example.domain.datamodel.register.signin.RegisterResponse
 import com.example.domain.datamodel.register.signin.User
 import com.example.domain.usecases.register.SignInUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SignInViewModel(
-    val signInUseCase: SignInUseCase
+@HiltViewModel
+class SignInViewModel @Inject constructor(
+    private val signInUseCase: SignInUseCase
 ) : ViewModel() {
 
     private val _registerResponse = MutableStateFlow<RegisterResponse?>(null)
@@ -65,7 +68,7 @@ class SignInViewModel(
             _nameError.value = "Name is required"
             isValid = false
         } else if (user.username.length < 3) {
-            _nameError.value="Name cannot less than 3 charterers"
+            _nameError.value = "Name cannot less than 3 charterers"
         } else {
             _nameError.value = null
         }

@@ -76,7 +76,7 @@ import java.util.Locale
 import com.example.marketingapp.search.HomeViewModel.SortOption
 
 @Composable
-fun SearchScreen(navController: NavController, viewModel: HomeViewModel = hiltViewModel()) {
+fun HomeScreen(navController: NavController, viewModel: HomeViewModel = hiltViewModel()) {
     val context = LocalContext.current
     val filteredProperties by viewModel.filteredProperties.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -91,7 +91,6 @@ fun SearchScreen(navController: NavController, viewModel: HomeViewModel = hiltVi
     LaunchedEffect(Unit) {
         val token = tokenManager.getToken()
         if (token != null) {
-            // Set the default sort option (newest) when the screen is opened
             viewModel.setSelectedSortOption(SortOption("listedAt", false))
             viewModel.getAllProperty(token)
         }
@@ -114,7 +113,6 @@ fun SearchScreen(navController: NavController, viewModel: HomeViewModel = hiltVi
                 onSearch = { query ->
                     val token = tokenManager.getToken()
                     if (query.isEmpty()) {
-                        // Fetch all properties if search query is cleared
                         viewModel.getAllProperty(token ?: "")
                     } else {
                         viewModel.searchProperties(token ?: "", query)
@@ -126,42 +124,27 @@ fun SearchScreen(navController: NavController, viewModel: HomeViewModel = hiltVi
                 viewModel.filterPropertiesByStatus(status)
             }
 
-            if (isLoading) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.White.copy(alpha = 0.8f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        color = colorResource(id = R.color.green)
-                    )
-                }
-            } else {
-                LazyColumn(
-                    state = listState,
-                    modifier = Modifier.padding(top = Dimension.MediumPadding)
-                ) {
-                    items(filteredProperties) { property ->
-                        PropertyCard(
-                            imageUrls = property?.imageUrl ?: emptyList(),
-                            price = property?.price.toString(),
-                            title = property?.title ?: "",
-                            description = property?.description ?: "",
-                            area = property?.area ?: 0.0,
-                            location = property?.location ?: "",
-                            date = property?.listedAt ?: "",
-                            onClick = {
-                                val intent =
-                                    Intent(context, PropertyDetailsActivity::class.java).apply {
-                                        putExtra("property", property)
-                                        putExtra("source", "search")
-
-                                    }
-                                context.startActivity(intent)
+            LazyColumn(
+                state = listState,
+                modifier = Modifier.padding(top = Dimension.MediumPadding)
+            ) {
+                items(filteredProperties) { property ->
+                    PropertyCard(
+                        imageUrls = property?.imageUrl ?: emptyList(),
+                        price = property?.price.toString(),
+                        title = property?.title ?: "",
+                        description = property?.description ?: "",
+                        area = property?.area ?: 0.0,
+                        location = property?.location ?: "",
+                        date = property?.listedAt ?: "",
+                        onClick = {
+                            val intent = Intent(context, PropertyDetailsActivity::class.java).apply {
+                                putExtra("property", property)
+                                putExtra("source", "search")
                             }
-                        )
-                    }
+                            context.startActivity(intent)
+                        }
+                    )
                 }
             }
         }
@@ -194,6 +177,20 @@ fun SearchScreen(navController: NavController, viewModel: HomeViewModel = hiltVi
                 )
             }
         ) {}
+
+        // Show loading indicator only when fetching all properties, not during search
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White.copy(alpha = 0.8f)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    color = colorResource(id = R.color.green)
+                )
+            }
+        }
     }
 }
 
@@ -298,6 +295,7 @@ fun SearchBar(
                 onValueChange = { newTextValue ->
                     textValue = newTextValue
                     // Do not trigger search here
+                    onSearch(newTextValue.text) // Trigger search here
                 },
                 placeholder = { Text(text = placeholderText, color = Color.Gray) },
                 modifier = Modifier
@@ -434,8 +432,8 @@ fun PropertyCard(
                 if (hasImages) {
                     val painter = rememberAsyncImagePainter(
                         model = imageUrls[currentImageIndex],
-                        placeholder = painterResource(id = R.drawable.no_image),
-                        error = painterResource(id = R.drawable.no_image)
+                        placeholder = painterResource(id = R.drawable.black),
+                        error = painterResource(id = R.drawable.black)
                     )
                     val painterState = painter.state
 
@@ -465,7 +463,7 @@ fun PropertyCard(
                         modifier = Modifier.align(Alignment.CenterStart)
                     ) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_arrow_left),
+                            painter = painterResource(id = R.drawable.arrow_back),
                             contentDescription = "Previous Image",
                             tint = Color.White
                         )
@@ -485,7 +483,7 @@ fun PropertyCard(
                     }
                 } else {
                     Image(
-                        painter = painterResource(id = R.drawable.no_image),
+                        painter = painterResource(id = R.drawable.black),
                         contentDescription = "No Image Available",
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.FillBounds

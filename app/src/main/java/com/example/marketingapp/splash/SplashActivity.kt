@@ -29,6 +29,8 @@ class SplashActivity : ComponentActivity() {
     }
 }
 
+
+//eaqarat misr
 @Composable
 fun SplashScreen() {
     val context = LocalContext.current

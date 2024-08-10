@@ -44,6 +44,7 @@ class HomeViewModel @Inject constructor(
         _selectedSortOption.value = SortOption("listedAt", false)
     }
 
+
     data class SortOption(val sortBy: String, val ascending: Boolean)
 
     fun setSelectedSortOption(option: SortOption) {

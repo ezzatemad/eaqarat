@@ -16,9 +16,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.compose.*
 import com.example.marketingapp.R
 import com.example.marketingapp.account.AccountScreen
-import com.example.marketingapp.home.HomeScreen
 import com.example.marketingapp.favorite.FavoriteScreen
-import com.example.marketingapp.search.SearchScreen
+import com.example.marketingapp.search.HomeScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -42,6 +41,30 @@ class MainActivity : ComponentActivity() {
                 BottomNavigation(
                     backgroundColor = Color.White
                 ) {
+//                    BottomNavigationItem(
+//                        icon = {
+//                            Icon(
+//                                painter = painterResource(id = R.drawable.ic_home),
+//                                contentDescription = "Home"
+//                            )
+//                        },
+//                        label = { Text("Home") },
+//                        selected = currentRoute == "home",
+//                        onClick = {
+//                            if (currentRoute != "home") {
+//                                navController.navigate("home") {
+//                                    // Clear back stack to prevent navigating back to the same screen
+//                                    popUpTo(navController.graph.startDestinationId) {
+//                                        saveState = true
+//                                    }
+//                                    launchSingleTop = true
+//                                    restoreState = true
+//                                }
+//                            }
+//                        },
+//                        selectedContentColor = colorResource(id = R.color.green),
+//                        unselectedContentColor = colorResource(id = R.color.gray)
+//                    )
                     BottomNavigationItem(
                         icon = {
                             Icon(
@@ -69,31 +92,7 @@ class MainActivity : ComponentActivity() {
                     BottomNavigationItem(
                         icon = {
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_search),
-                                contentDescription = "Search"
-                            )
-                        },
-                        label = { Text("Search") },
-                        selected = currentRoute == "search",
-                        onClick = {
-                            if (currentRoute != "search") {
-                                navController.navigate("search") {
-                                    // Clear back stack to prevent navigating back to the same screen
-                                    popUpTo(navController.graph.startDestinationId) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            }
-                        },
-                        selectedContentColor = colorResource(id = R.color.green),
-                        unselectedContentColor = colorResource(id = R.color.gray)
-                    )
-                    BottomNavigationItem(
-                        icon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_seitting),
+                                painter = painterResource(id = R.drawable.ic_favorite),
                                 contentDescription = "favorite"
                             )
                         },
@@ -146,8 +145,7 @@ class MainActivity : ComponentActivity() {
                 startDestination = "home",
                 Modifier.padding(innerPadding)
             ) {
-                composable("home") { HomeScreen() }
-                composable("search") { SearchScreen(navController = navController) }
+                composable("home") { HomeScreen(navController = navController) }
                 composable("favorite") { FavoriteScreen() }
                 composable("account") { AccountScreen() }
             }

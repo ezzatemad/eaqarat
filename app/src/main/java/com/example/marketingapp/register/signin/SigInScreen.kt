@@ -167,7 +167,7 @@ fun SignInContent(viewModel: SignInViewModel, isLoading: Boolean) {
             onTextChange = { newText -> phone = newText },
             label = stringResource(id = R.string.phone),
             maxLines = 1,
-            icon = R.drawable.ic_email,
+            icon = R.drawable.ic_phone,
             modifier = Modifier,
             isPassword = false,
             error = phoneError
@@ -330,7 +330,7 @@ fun SignInTextField(
                 {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
-                            painter = painterResource(id = if (passwordVisible) R.drawable.ic_hide_eye else R.drawable.ic_hide_eye),
+                            painter = painterResource(id = if (passwordVisible) R.drawable.ic_eye else R.drawable.ic_hide_eye),
                             contentDescription = if (passwordVisible) "Hide password" else "Show password",
                             tint = colorResource(id = R.color.green)
                         )

@@ -44,6 +44,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -79,35 +80,51 @@ fun FavoriteScreen(viewModel: FavouritePropertyViewModel = hiltViewModel()) {
             }
         }
     ) { contentPadding ->
-        LazyColumn(
-            contentPadding = contentPadding
-        ) {
-            items(propertyList) { property ->
-                FavoritePropertyCard(
-                    imageUrls = property.imageUrl?.filterNotNull() ?: emptyList(),
-                    price = property.price.toString(),
-                    title = property.title ?: "Unknown",
-                    description = property.description ?: "Unknown",
-                    area = property.area ?: 0.0,
-                    location = property.location ?: "Unknown",
-                    date = property.listedAt ?: "Unknown",
-                    property = property,
-                    viewModel = viewModel,
-                    onClick = {
-                        val intent = Intent(context, PropertyDetailsActivity::class.java).apply {
-                            putExtra("property", property)
-                            putExtra("source", "favorite")
-                        }
-                        context.startActivity(intent)
-                    },
-                    onRemoveFavorite = {
-                        viewModel.removeFavorite(property)
-                        refreshTrigger = Unit
-                        coroutineScope.launch {
-                            scaffoldState.snackbarHostState.showSnackbar(context.getString(R.string.property_removed_from_favorites))
-                        }
-                    }
+        if (propertyList.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(contentPadding),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.no_favorites_items),
+                    style = MaterialTheme.typography.h6,
+                    color = colorResource(id = R.color.gray)
                 )
+            }
+        } else {
+            LazyColumn(
+                contentPadding = contentPadding
+            ) {
+                items(propertyList) { property ->
+                    FavoritePropertyCard(
+                        imageUrls = property.imageUrl?.filterNotNull() ?: emptyList(),
+                        price = property.price.toString(),
+                        title = property.title ?: "Unknown",
+                        description = property.description ?: "Unknown",
+                        area = property.area ?: 0.0,
+                        location = property.location ?: "Unknown",
+                        date = property.listedAt ?: "Unknown",
+                        property = property,
+                        viewModel = viewModel,
+                        onClick = {
+                            val intent =
+                                Intent(context, PropertyDetailsActivity::class.java).apply {
+                                    putExtra("property", property)
+                                    putExtra("source", "favorite")
+                                }
+                            context.startActivity(intent)
+                        },
+                        onRemoveFavorite = {
+                            viewModel.removeFavorite(property)
+                            refreshTrigger = Unit
+                            coroutineScope.launch {
+                                scaffoldState.snackbarHostState.showSnackbar(context.getString(R.string.property_removed_from_favorites))
+                            }
+                        }
+                    )
+                }
             }
         }
     }
@@ -156,8 +173,8 @@ fun FavoritePropertyCard(
                     if (hasImages) {
                         val painter = rememberAsyncImagePainter(
                             model = imageUrls[currentImageIndex],
-                            placeholder = painterResource(id = R.drawable.no_image),
-                            error = painterResource(id = R.drawable.no_image)
+                            placeholder = painterResource(id = R.drawable.black),
+                            error = painterResource(id = R.drawable.black)
                         )
                         val painterState = painter.state
 
@@ -208,7 +225,7 @@ fun FavoritePropertyCard(
                         }
                     } else {
                         Image(
-                            painter = painterResource(id = R.drawable.no_image),
+                            painter = painterResource(id = R.drawable.black),
                             contentDescription = "No Image Available",
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.FillBounds
@@ -346,8 +363,8 @@ fun FavoriteTopIconsRow(
     ) {
         IconButton(onClick = { /* Handle action 1 */ }) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_email),
-                contentDescription = "Action 1",
+                painter = painterResource(id = R.drawable.ic_share),
+                contentDescription = "Share",
                 tint = Color.White
             )
         }
