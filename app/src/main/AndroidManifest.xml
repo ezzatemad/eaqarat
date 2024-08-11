@@ -23,11 +23,6 @@
             android:label="@string/title_activity_second_splash"
             android:theme="@style/Theme.MarketingApp" />
         <activity
-            android:name=".splash.SecondActivity"
-            android:exported="false"
-            android:label="@string/title_activity_second"
-            android:theme="@style/Theme.MarketingApp" />
-        <activity
             android:name=".propertydetails.PropertyDetailsActivity"
             android:exported="true"
             android:theme="@style/Theme.MarketingApp">
