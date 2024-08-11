@@ -75,7 +75,7 @@ fun SplashScreen() {
                     .padding(start = Dimension.LargePadding, end = Dimension.LargePadding),
                 color = Color.White,
                 textAlign = TextAlign.Center,
-                fontSize = Dimension.LargeFontSize
+                fontSize = Dimension.BiggestLargerFontSize
             )
         }
     }
