@@ -45,5 +45,6 @@
     <string name="property_removed_from_favorites">Property removed from favorites</string>
     <string name="no_favorites_items">No Favorites Items</string>
     <string name="title_activity_second">SecondActivity</string>
+    <string name="title_activity_second_splash">SecondSplashActivity</string>
 
 </resources>

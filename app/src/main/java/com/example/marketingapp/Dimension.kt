@@ -14,6 +14,7 @@ object Dimension {
     val SmallFontSize = 12.sp
     val MediumFontSize = 16.sp
     val LargeFontSize = 24.sp
+    val BiggestLargerFontSize=30.sp
 
     val SmallCornerRadius = 4.dp
     val MediumCornerRadius = 8.dp
