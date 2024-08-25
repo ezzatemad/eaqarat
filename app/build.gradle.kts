@@ -104,6 +104,8 @@ dependencies {
     // Dependency Injection
     implementation("com.google.dagger:hilt-android:2.50")
     kapt("com.google.dagger:hilt-compiler:2.50")
+    implementation ("androidx.hilt:hilt-work:1.2.0")
+
 
 
     //RXAndroid
@@ -124,6 +126,9 @@ dependencies {
     implementation("com.google.accompanist:accompanist-flowlayout:0.24.13-rc")
     implementation ("com.google.code.gson:gson:2.10.1")
 
+
+    //work manager
+    implementation ("androidx.work:work-runtime-ktx:2.9.1")
 
 
 }

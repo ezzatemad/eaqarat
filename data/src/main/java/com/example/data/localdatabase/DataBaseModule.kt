@@ -25,4 +25,6 @@ object DataBaseModule {
     fun provideTaskQueries(database: PropertyItem): PropertyItemQueries {
         return database.propertyItemQueries
     }
+
+
 }

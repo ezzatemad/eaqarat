@@ -40,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -49,6 +48,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.example.domain.datamodel.getallproperty.DataItem
@@ -57,13 +59,14 @@ import com.example.marketingapp.R
 import com.example.marketingapp.propertydetails.PropertyDetailsActivity
 import com.example.marketingapp.search.formatDate
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 @Composable
 fun FavoriteScreen(viewModel: FavouritePropertyViewModel = hiltViewModel()) {
     val context = LocalContext.current
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
-
+    val workManager = WorkManager.getInstance(context)
     var refreshTrigger by remember { mutableStateOf(Unit) }
 
     LaunchedEffect(refreshTrigger) {
@@ -117,10 +120,14 @@ fun FavoriteScreen(viewModel: FavouritePropertyViewModel = hiltViewModel()) {
                             context.startActivity(intent)
                         },
                         onRemoveFavorite = {
-                            viewModel.removeFavorite(property)
-                            refreshTrigger = Unit
                             coroutineScope.launch {
-                                scaffoldState.snackbarHostState.showSnackbar(context.getString(R.string.property_removed_from_favorites))
+                                // Handle property removal
+                                viewModel.removeFavorite(property)
+                                // Update UI after removal
+                                refreshTrigger = Unit
+                                scaffoldState.snackbarHostState.showSnackbar(
+                                    context.getString(R.string.property_removed_from_favorites)
+                                )
                             }
                         }
                     )

@@ -14,14 +14,14 @@ interface LocalDataBaseDataSource {
         location: String,
         title: String,
         listedAt: String,
-        status: String
+        status: String,
     )
 
     // Method to retrieve all properties
     suspend fun getAllProperties(): List<DataItem>
 
     // Method to delete a property by its ID
-    suspend fun deletePropertyById(propertyId: Long)
+    fun deletePropertyById(propertyId: Long)
 
     // Method to check if a property is marked as a favorite
     suspend fun isPropertyFavourite(propertyId: Long): Boolean

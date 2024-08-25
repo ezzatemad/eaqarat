@@ -1,30 +1,36 @@
 package com.example.data.datasourceimple.localdatabase
 
 import android.util.Log
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.example.data.PropertyItem
 import com.example.data.datasource.localdatabase.LocalDataBaseDataSource
-import com.example.data.model.FavouriteItem
 import com.example.domain.datamodel.getallproperty.DataItem
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+
 class LocalDataBaseDataSourceImpl @Inject constructor(
-    private val propertyItem: PropertyItem
+    private val propertyItem: PropertyItem,
 ) : LocalDataBaseDataSource {
+
+    val currentTime = System.currentTimeMillis()
 
     override suspend fun insertProperty(
         id: Long,
         area: String,
         price: String,
         propertyType: String,
-        images: List<String>, // Updated to accept a list of image URLs
+        images: List<String>,
         description: String,
         location: String,
         title: String,
         listedAt: String,
         status: String
     ) {
+        Log.d("TAG", "insertProperty: $currentTime")
         try {
-            // Insert property details
             propertyItem.propertyItemQueries.insertDataItem(
                 id,
                 area,
@@ -34,10 +40,9 @@ class LocalDataBaseDataSourceImpl @Inject constructor(
                 location,
                 title,
                 listedAt,
-                status
+                status,
             )
 
-            // Insert images
             images.forEach { imageUrl ->
                 propertyItem.propertyItemQueries.InsertImages(
                     property_id = id,
@@ -49,6 +54,9 @@ class LocalDataBaseDataSourceImpl @Inject constructor(
             Log.d("TAG", "insertProperty: ${ex.localizedMessage}")
         }
     }
+
+
+
 
     override suspend fun getAllProperties(): List<DataItem> {
         return propertyItem.propertyItemQueries.selectAllDataItems().executeAsList()
@@ -64,7 +72,7 @@ class LocalDataBaseDataSourceImpl @Inject constructor(
                     area = propertyDB.area?.toDouble(),
                     propertyType = propertyDB.propertyType,
                     price = propertyDB.price?.toDouble(),
-                    imageUrl = images, // Include images
+                    imageUrl = images,
                     status = propertyDB.status,
                     description = propertyDB.description,
                     title = propertyDB.title,
@@ -74,7 +82,7 @@ class LocalDataBaseDataSourceImpl @Inject constructor(
             }
     }
 
-    override suspend fun deletePropertyById(propertyId: Long) {
+    override fun deletePropertyById(propertyId: Long) {
         try {
             // Delete images associated with the property
             propertyItem.propertyItemQueries.deleteImagesByPropertyId(propertyId)

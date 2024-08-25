@@ -20,7 +20,7 @@ class LocalDataBaseRepoImpl @Inject constructor(
         location: String,
         title: String,
         listedAt: String,
-        status: String
+        status: String,
     ) {
         try {
             // Insert property details
@@ -34,7 +34,7 @@ class LocalDataBaseRepoImpl @Inject constructor(
                 location,
                 title,
                 listedAt,
-                status
+                status,
             )
         } catch (ex: Exception) {
             Log.d("TAG", "insertProperty: ${ex.localizedMessage}")
@@ -45,7 +45,7 @@ class LocalDataBaseRepoImpl @Inject constructor(
         return localDataBaseDataSource.getAllProperties()
     }
 
-    override suspend fun deletePropertyById(propertyId: Long) {
+    override fun deletePropertyById(propertyId: Long) {
         try {
             // Delete the property and its associated images
             localDataBaseDataSource.deletePropertyById(propertyId)

@@ -1,21 +1,28 @@
-
 package com.example.marketingapp.favorite
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.example.domain.datamodel.getallproperty.DataItem
 import com.example.domain.usecases.locadatabase.LocalDataBaseUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
 class FavouritePropertyViewModel @Inject constructor(
-    private val localDataBaseUseCase: LocalDataBaseUseCase
+    private val localDataBaseUseCase: LocalDataBaseUseCase,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
     private val _isFavourite = MutableStateFlow(false)
     val isFavourite: StateFlow<Boolean> get() = _isFavourite
@@ -25,7 +32,6 @@ class FavouritePropertyViewModel @Inject constructor(
 
     private val _snackbarMessage = MutableStateFlow<String?>(null)
     val snackbarMessage: StateFlow<String?> get() = _snackbarMessage.asStateFlow()
-
 
 
     fun removeFavorite(property: DataItem) {
@@ -52,22 +58,25 @@ class FavouritePropertyViewModel @Inject constructor(
                         area = property.area?.toString() ?: "",
                         price = property.price?.toString() ?: "",
                         propertyType = property.propertyType ?: "",
-                        images = property.imageUrl?.filterNotNull() ?: emptyList(), // Filter out nulls
+                        images = property.imageUrl?.filterNotNull()
+                            ?: emptyList(), // Filter out nulls
                         description = property.description ?: "",
                         location = property.location ?: "",
                         title = property.title ?: "",
                         listedAt = property.listedAt ?: "",
-                        status = property.status ?: ""
+                        status = property.status ?: "",
                     )
                     _isFavourite.value = true
                     _snackbarMessage.value = "Property added to favorites"
+
                 }
             } catch (ex: Exception) {
-                Log.d("TAG", "toggleFavouriteStatus: ${ex.localizedMessage}")
+                Log.e("tag", "Error toggling favorite status: ${ex.localizedMessage}")
                 _snackbarMessage.value = "Error updating favorite status"
             }
         }
     }
+
 
     fun checkIfFavourite(property: DataItem) {
         viewModelScope.launch {
