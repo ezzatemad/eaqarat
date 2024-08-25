@@ -147,7 +147,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 composable("home") { HomeScreen(navController = navController) }
                 composable("favorite") { FavoriteScreen() }
-                composable("account") { AccountScreen() }
+                composable("account") { AccountScreen(navController = navController) }
             }
         }
     }

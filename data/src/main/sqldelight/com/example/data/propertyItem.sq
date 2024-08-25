@@ -24,8 +24,26 @@ INSERT INTO property_item (
     id, area, price, propertyType, description, location, title, listedAt, status
 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 
+-- UPDATE property_item
+-- SET
+--     area = ?, price = ?, propertyType = ?, description = ?, location = ?, title = ?, listedAt = ?, status = ?, created_at = ?
+-- WHERE id = ?;
+
+
 InsertImages:
 INSERT INTO property_images_item (property_id, imageUrl) VALUES (?, ?);
+
+updateProperty:
+UPDATE property_item
+SET
+    area = ?, price = ?, propertyType = ?, description = ?, location = ?, title = ?, listedAt = ?, status = ?
+WHERE id = ?;
+
+updateImage:
+UPDATE property_images_item
+SET imageUrl = ?
+WHERE id = ?;
+
 
 
 selectAllDataItems:

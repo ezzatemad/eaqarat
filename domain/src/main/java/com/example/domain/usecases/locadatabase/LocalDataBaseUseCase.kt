@@ -1,4 +1,3 @@
-
 package com.example.domain.usecases.locadatabase
 
 import android.util.Log
@@ -19,7 +18,7 @@ class LocalDataBaseUseCase @Inject constructor(
         location: String,
         title: String,
         listedAt: String,
-        status: String
+        status: String,
     ) {
         try {
             localDataBaseRepo.insertProperty(
@@ -32,7 +31,7 @@ class LocalDataBaseUseCase @Inject constructor(
                 location,
                 title,
                 listedAt,
-                status
+                status,
             )
         } catch (ex: Exception) {
             Log.d("TAG", "insertProperty: ${ex.localizedMessage}")
@@ -48,7 +47,7 @@ class LocalDataBaseUseCase @Inject constructor(
         }
     }
 
-    suspend fun deletePropertyById(propertyId: Long) {
+    fun deletePropertyById(propertyId: Long) {
         try {
             localDataBaseRepo.deletePropertyById(propertyId)
         } catch (ex: Exception) {

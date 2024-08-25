@@ -19,6 +19,7 @@ object Dimension {
     val SmallCornerRadius = 4.dp
     val MediumCornerRadius = 8.dp
     val LargeCornerRadius = 12.dp
+    val BiggestLargeCornerRadius = 16.dp
 
     val SmallSpace = 4.dp
     val MediumSpace = 8.dp

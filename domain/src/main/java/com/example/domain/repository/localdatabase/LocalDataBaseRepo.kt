@@ -18,7 +18,7 @@ interface LocalDataBaseRepo {
 
     suspend fun getAllProperty(): List<DataItem>
 
-    suspend fun deletePropertyById(propertyId: Long)
+    fun deletePropertyById(propertyId: Long)
 
     suspend fun isPropertyFavourite(propertyId: Long): Boolean
 }

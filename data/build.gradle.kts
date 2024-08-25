@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(project(":domain"))
+    implementation(libs.androidx.hilt.work)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -78,7 +79,7 @@ dependencies {
 
 
     //Work Manager
-    val work_version = "2.9.0"
+    val work_version = "2.9.1"
     implementation ("androidx.work:work-runtime-ktx:$work_version")
 
 
